@@ -34,7 +34,6 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
 import sys
 # import ctree
 
-sys.path.append('/home/EPVD/')
 import numpy as np
 import torch
 import torch.nn as nn
@@ -282,7 +281,6 @@ def main():
 
     model.to(args.device)
 
-    # 使用时恢复下行
     output = open('datasets/BCB/preprocess/path_embeddings_3_v2.pkl', 'wb')
     path_dict = {}
     state_dict = {}
@@ -291,15 +289,18 @@ def main():
     sum_pr = 0
     num_path_dict = {}
     code_path = '../source_datasets/BCB/id2sourcecode'
-    # code_path = '../source_datasets/BCB/test_code'
+
+
     file_list = os.listdir(code_path)
+    random.shuffle(file_list)
+    logger.info("start!!!")
 
     for file in file_list:
         code = open(f"{code_path}/{file}", encoding='UTF-8').read()
         code = code.strip()
         num_id += 1
-        if num_id%100==0:
-            print(num_id, flush=True)
+        if num_id % 1000 == 0:
+            break
         clean_code, code_dict = remove_comments_and_docstrings(code, 'java')
         g = C_CFG()
         code_ast = ps.tree_sitter_ast(clean_code, Lang.JAVA)
@@ -308,27 +309,7 @@ def main():
         num_path, cfg_allpath, _, ratio , path_real = g.get_allpath()
         # sum_ratio += ratio
         # sum_pr += path_real
-        path_tokens1 = extract_pathtoken(code_dict, cfg_allpath)
 
-        all_seq_ids = []
-        for seq in path_tokens1:
-            seq = ' '.join(seq.split())
-            seq_tokens = tokenizer.tokenize(seq)[:args.block_size - 2]
-            seq_tokens = [tokenizer.cls_token] + seq_tokens + [tokenizer.sep_token]
-            seq_ids = tokenizer.convert_tokens_to_ids(seq_tokens)
-            padding_length = args.block_size - len(seq_ids)
-            seq_ids += [tokenizer.pad_token_id] * padding_length
-            all_seq_ids.append(seq_ids)
-        # all_seq_ids = all_seq_ids[:args.filter_size]    # [3, 510]    [path_num, ids_len_of_path/token_len]
-        all_seq_ids = all_seq_ids[:3]
-
-        all_seq_ids = torch.tensor(all_seq_ids, dtype=torch.int64, device=args.device)
-        # 计算路径表示E                                                    # [batch, path_num, ids_len_of_path/token_len]
-        seq_embeds = model(all_seq_ids, attention_mask=all_seq_ids.ne(1))[0]  # [3, 510] -> [3, 510, 768]
-        seq_embeds = seq_embeds[:, 0, :]  # [3, 510, 768] -> [3, 768]
-        seq_embeds = seq_embeds.tolist()
-
-        path_dict[file[:-5]] = seq_embeds, cfg_allpath
     print("test file finish...", flush=True)
     # print(sum_ratio/num_id, flush=True)
     # print(sum_pr/num_id, flush=True)

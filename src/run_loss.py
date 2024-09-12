@@ -158,12 +158,38 @@ def convert_examples_to_features_clone_eval(js, tokenizer, path_dict, args):
 
 # 输入为未预处理excel生成的jsonl。
 # class JsonDataset(Dataset):
+# class TrainDataset(Dataset):
+#     def __init__(self, tokenizer, args, file_path=None):
+#         self.examples = []
+#         # pkl_file = open(args.pkl_file, 'rb')
+#         # path_dict = pickle.load(pkl_file)
+#         pkl_file = open(args.pkl_file, 'rb')
+#         path_dict = pickle.load(pkl_file)
+#
+#         with open(file_path, encoding="UTF-8") as f1:
+#             for idx, line in enumerate(f1):
+#                 js = json.loads(line.strip())
+#                 # idx_list = line.strip().split(',')
+#                 # for idx in idx_list:
+#                 #     code = open(f"../test_dataset/id2sourcecode/{idx}.java", encoding='UTF-8').read()
+#                 #     group.append(code)
+#                 self.examples.append(convert_examples_to_features_clone(js, tokenizer, path_dict, args))
+#
+#     def __len__(self):
+#         return len(self.examples)
+#
+#     def __getitem__(self, i):
+#         return (self.examples[i].an_path_embeds,
+#                 self.examples[i].po_path_embeds,
+#                 self.examples[i].ne_path_embeds)
+
+
 class TrainDataset(Dataset):
     def __init__(self, tokenizer, args, file_path=None):
         self.examples = []
         # pkl_file = open(args.pkl_file, 'rb')
         # path_dict = pickle.load(pkl_file)
-        pkl_file = open(args.pkl_file, 'rb')
+        pkl_file = open(args.train_pkl_file, 'rb')
         path_dict = pickle.load(pkl_file)
 
         with open(file_path, encoding="UTF-8") as f1:
@@ -173,7 +199,7 @@ class TrainDataset(Dataset):
                 # for idx in idx_list:
                 #     code = open(f"../test_dataset/id2sourcecode/{idx}.java", encoding='UTF-8').read()
                 #     group.append(code)
-                self.examples.append(convert_examples_to_features_clone(js, tokenizer, path_dict, args))
+                self.examples.append(convert_examples_to_features_clone_eval(js, tokenizer, path_dict, args))
 
     def __len__(self):
         return len(self.examples)
@@ -181,14 +207,14 @@ class TrainDataset(Dataset):
     def __getitem__(self, i):
         return (self.examples[i].an_path_embeds,
                 self.examples[i].po_path_embeds,
-                self.examples[i].ne_path_embeds)
+                self.examples[i].label)
 
 class EvalDataset(Dataset):
     def __init__(self, tokenizer, args, file_path=None):
         self.examples = []
         # pkl_file = open(args.pkl_file, 'rb')
         # path_dict = pickle.load(pkl_file)
-        pkl_file = open(args.pkl_file, 'rb')
+        pkl_file = open(args.eval_pkl_file, 'rb')
         path_dict = pickle.load(pkl_file)
 
         with open(file_path, encoding="UTF-8") as f1:
@@ -645,7 +671,8 @@ def main():
     parser.add_argument('--lambda_reg', type=float, default=0, help="For norm.")
     
     parser.add_argument('--d_size', type=int, default=128, help="For cnn filter size.")
-    parser.add_argument('--pkl_file', type=str, default='', help='for dataset path pkl file')
+    parser.add_argument('--train_pkl_file', type=str, default='', help='for dataset path pkl file')
+    parser.add_argument('--eval_pkl_file', type=str, default='', help='for dataset path pkl file')
     args = parser.parse_args()
 
     # Setup distant debugging if needed
@@ -731,7 +758,7 @@ def main():
         if args.local_rank not in [-1, 0]:
             torch.distributed.barrier()  # Barrier to make sure only the first process in distributed training process the dataset, and the others will use the cache
 
-        train_dataset = EvalDataset(tokenizer, args, args.train_data_file)
+        train_dataset = TrainDataset(tokenizer, args, args.train_data_file)
         if args.local_rank == 0:
             torch.distributed.barrier()
 
