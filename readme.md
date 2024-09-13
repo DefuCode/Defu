@@ -54,15 +54,15 @@ train.jsonl/valid.jsonl/test.jsonl are stored in jsonlines format. Each line in 
 
 ```shell
 # BCB
-python data_process_embeddings_3_BCB.py
-	--model_type=roberta \
+python data_process_embeddings_3_BCB.py \
+    --model_type=roberta \
     --tokenizer_name=../models/graphcodebert \
     --model_name_or_path=../models/graphcodebert \
     --block_size 512 \
     --seed 123456 
 # GCJ
-python data_process_embeddings_3_GCJ.py
-	--model_type=roberta \
+python data_process_embeddings_3_GCJ.py \
+    --model_type=roberta \
     --tokenizer_name=../models/graphcodebert \
     --model_name_or_path=../models/graphcodebert \
     --block_size 512 \
@@ -75,8 +75,8 @@ python data_process_embeddings_3_GCJ.py
 
 ```shell
 python run_loss.py \
-	--output_dir=./saved_models \
-	--model_type=roberta \
+    --output_dir=./saved_models \
+    --model_type=roberta \
     --tokenizer_name=../models/graphcodebert \
     --model_name_or_path=../models/graphcodebert \
     --do_train \
@@ -103,8 +103,8 @@ python run_loss.py \
 
 ```shell
 python run_loss.py \
-	--output_dir=./saved_models \
-	--model_type=roberta \
+    --output_dir=./saved_models \
+    --model_type=roberta \
     --tokenizer_name=../models/graphcodebert \
     --model_name_or_path=../models/graphcodebert \
     --do_eval \
@@ -131,8 +131,8 @@ python run_loss.py \
 
 ```shell
 # Get code pairs at each length level
-python RQ4_long_dataset.py
-	--model_type=roberta \
+python RQ4_long_dataset.py \
+    --model_type=roberta \
     --tokenizer_name=../models/graphcodebert \
     --model_name_or_path=../models/graphcodebert \
     --block_size 512 \
