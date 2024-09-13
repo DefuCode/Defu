@@ -1,24 +1,3 @@
-# coding=utf-8
-# Copyright 2018 The Google AI Language Team Authors and The HuggingFace Inc. team.
-# Copyright (c) 2018, NVIDIA CORPORATION.  All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-"""
-Fine-tuning the library models for language modeling on a text file (GPT, GPT-2, BERT, RoBERTa).
-GPT and GPT-2 are fine-tuned using a causal language modeling (CLM) loss while BERT and RoBERTa are fine-tuned
-using a masked language modeling (MLM) loss.
-"""
-
 from __future__ import absolute_import, division, print_function
 
 import argparse
@@ -101,9 +80,9 @@ def main():
     parser = argparse.ArgumentParser()
 
     ## Required parameters
-    parser.add_argument("--train_data_file", default=None, type=str, required=True,
+    parser.add_argument("--train_data_file", default=None, type=str,
                         help="The input training data file (a text file).")
-    parser.add_argument("--output_dir", default=None, type=str, required=True,
+    parser.add_argument("--output_dir", default=None, type=str,
                         help="The output directory where the model predictions and checkpoints will be written.")
     # 添加参数
     # parser.add_argument("--train_data_file", default=None, type=str, required=True,
@@ -137,37 +116,6 @@ def main():
                         help="Optional input sequence length after tokenization."
                              "The training dataset will be truncated in block of this size for training."
                              "Default to the model max input length for single sentence inputs (take into account special tokens).")
-    parser.add_argument("--do_train", action='store_true',
-                        help="Whether to run training.")
-    parser.add_argument("--do_eval", action='store_true',
-                        help="Whether to run eval on the dev set.")
-    parser.add_argument("--do_test", action='store_true',
-                        help="Whether to run eval on the dev set.")
-    parser.add_argument("--evaluate_during_training", action='store_true',
-                        help="Run evaluation during training at each logging step.")
-    parser.add_argument("--do_lower_case", action='store_true',
-                        help="Set this flag if you are using an uncased model.")
-
-    parser.add_argument("--train_batch_size", default=4, type=int,
-                        help="Batch size per GPU/CPU for training.")
-    parser.add_argument("--eval_batch_size", default=4, type=int,
-                        help="Batch size per GPU/CPU for evaluation.")
-    parser.add_argument('--gradient_accumulation_steps', type=int, default=6,
-                        help="Number of updates steps to accumulate before performing a backward/update pass.")
-    parser.add_argument("--learning_rate", default=5e-5, type=float,
-                        help="The initial learning rate for Adam.")
-    parser.add_argument("--weight_decay", default=0.0, type=float,
-                        help="Weight deay if we apply some.")
-    parser.add_argument("--adam_epsilon", default=1e-8, type=float,
-                        help="Epsilon for Adam optimizer.")
-    parser.add_argument("--max_grad_norm", default=1.0, type=float,
-                        help="Max gradient norm.")
-    parser.add_argument("--num_train_epochs", default=1.0, type=float,
-                        help="Total number of training epochs to perform.")
-    parser.add_argument("--max_steps", default=-1, type=int,
-                        help="If > 0: set total number of training steps to perform. Override num_train_epochs.")
-    parser.add_argument("--warmup_steps", default=0, type=int,
-                        help="Linear warmup over warmup_steps.")
 
     parser.add_argument('--logging_steps', type=int, default=50,
                         help="Log every X updates steps.")
@@ -194,13 +142,6 @@ def main():
                              "See details at https://nvidia.github.io/apex/amp.html")
     parser.add_argument("--local_rank", type=int, default=-1,
                         help="For distributed training: local_rank")
-    parser.add_argument('--server_ip', type=str, default='', help="For distant debugging.")
-    parser.add_argument('--server_port', type=str, default='', help="For distant debugging.")
-    parser.add_argument('--cnn_size', type=int, default=1, help="For cnn size.")
-    parser.add_argument('--filter_size', type=int, default=2, help="For cnn filter size.")
-
-    parser.add_argument('--d_size', type=int, default=128, help="For cnn filter size.")
-    parser.add_argument('--pkl_file', type=str, default='', help='for dataset path pkl file')
     args = parser.parse_args()
 
     # Setup distant debugging if needed

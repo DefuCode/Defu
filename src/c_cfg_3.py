@@ -5,18 +5,14 @@ from itertools import islice
 
 class C_CFG():
     def __init__(self):
-        # 结束点
         self.finlineno = []
-        # 起始点
         self.firstlineno = 1
         self.loopflag = 0
         self.clean_code = ''
-
         self.func_name = dict()
         self.G = nx.DiGraph()
         self.DG = nx.DiGraph()
         self.circle = []
-        # 分支点
         self.dece_node = []
 
     def k_shortest_paths(self, G, source, target, k, weight=None):

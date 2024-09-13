@@ -1,24 +1,3 @@
-# coding=utf-8
-# Copyright 2018 The Google AI Language Team Authors and The HuggingFace Inc. team.
-# Copyright (c) 2018, NVIDIA CORPORATION.  All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-"""
-Fine-tuning the library models for language modeling on a text file (GPT, GPT-2, BERT, RoBERTa).
-GPT and GPT-2 are fine-tuned using a causal language modeling (CLM) loss while BERT and RoBERTa are fine-tuned
-using a masked language modeling (MLM) loss.
-"""
-
 from __future__ import absolute_import, division, print_function
 
 import argparse
@@ -32,8 +11,8 @@ import shutil
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
 import sys
-# import ctree
 
+sys.path.append('/home/EPVD/')
 import numpy as np
 import torch
 import torch.nn as nn
@@ -66,7 +45,7 @@ MODEL_CLASSES = {
 sys.path.append('..')
 
 import parserTool.parse as ps
-from c_cfg_3 import C_CFG
+from c_cfg_10 import C_CFG
 from parserTool.utils import remove_comments_and_docstrings
 from parserTool.parse import Lang
 import pickle
@@ -101,9 +80,9 @@ def main():
     parser = argparse.ArgumentParser()
 
     ## Required parameters
-    parser.add_argument("--train_data_file", default=None, type=str, required=True,
+    parser.add_argument("--train_data_file", default=None, type=str,
                         help="The input training data file (a text file).")
-    parser.add_argument("--output_dir", default=None, type=str, required=True,
+    parser.add_argument("--output_dir", default=None, type=str,
                         help="The output directory where the model predictions and checkpoints will be written.")
     # 添加参数
     # parser.add_argument("--train_data_file", default=None, type=str, required=True,
@@ -137,37 +116,6 @@ def main():
                         help="Optional input sequence length after tokenization."
                              "The training dataset will be truncated in block of this size for training."
                              "Default to the model max input length for single sentence inputs (take into account special tokens).")
-    parser.add_argument("--do_train", action='store_true',
-                        help="Whether to run training.")
-    parser.add_argument("--do_eval", action='store_true',
-                        help="Whether to run eval on the dev set.")
-    parser.add_argument("--do_test", action='store_true',
-                        help="Whether to run eval on the dev set.")
-    parser.add_argument("--evaluate_during_training", action='store_true',
-                        help="Run evaluation during training at each logging step.")
-    parser.add_argument("--do_lower_case", action='store_true',
-                        help="Set this flag if you are using an uncased model.")
-
-    parser.add_argument("--train_batch_size", default=4, type=int,
-                        help="Batch size per GPU/CPU for training.")
-    parser.add_argument("--eval_batch_size", default=4, type=int,
-                        help="Batch size per GPU/CPU for evaluation.")
-    parser.add_argument('--gradient_accumulation_steps', type=int, default=6,
-                        help="Number of updates steps to accumulate before performing a backward/update pass.")
-    parser.add_argument("--learning_rate", default=5e-5, type=float,
-                        help="The initial learning rate for Adam.")
-    parser.add_argument("--weight_decay", default=0.0, type=float,
-                        help="Weight deay if we apply some.")
-    parser.add_argument("--adam_epsilon", default=1e-8, type=float,
-                        help="Epsilon for Adam optimizer.")
-    parser.add_argument("--max_grad_norm", default=1.0, type=float,
-                        help="Max gradient norm.")
-    parser.add_argument("--num_train_epochs", default=1.0, type=float,
-                        help="Total number of training epochs to perform.")
-    parser.add_argument("--max_steps", default=-1, type=int,
-                        help="If > 0: set total number of training steps to perform. Override num_train_epochs.")
-    parser.add_argument("--warmup_steps", default=0, type=int,
-                        help="Linear warmup over warmup_steps.")
 
     parser.add_argument('--logging_steps', type=int, default=50,
                         help="Log every X updates steps.")
@@ -194,13 +142,6 @@ def main():
                              "See details at https://nvidia.github.io/apex/amp.html")
     parser.add_argument("--local_rank", type=int, default=-1,
                         help="For distributed training: local_rank")
-    parser.add_argument('--server_ip', type=str, default='', help="For distant debugging.")
-    parser.add_argument('--server_port', type=str, default='', help="For distant debugging.")
-    parser.add_argument('--cnn_size', type=int, default=1, help="For cnn size.")
-    parser.add_argument('--filter_size', type=int, default=2, help="For cnn filter size.")
-
-    parser.add_argument('--d_size', type=int, default=128, help="For cnn filter size.")
-    parser.add_argument('--pkl_file', type=str, default='', help='for dataset path pkl file')
     args = parser.parse_args()
 
     # Setup distant debugging if needed
@@ -277,55 +218,78 @@ def main():
         torch.distributed.barrier()  # End of barrier to make sure only the first process in distributed training download model & vocab
 
     logger.info("Training/evaluation parameters %s", args)
-    logger.info("start!!!")
 
     model.to(args.device)
 
-    output = open('datasets/BCB/preprocess/path_embeddings_3_v2.pkl', 'wb')
-    path_dict = {}
-    state_dict = {}
-    num_id = 0
+    output1 = open('../source_datasets/GCJ/rand/all/long_1.csv', 'a')
+    output2 = open('../source_datasets/GCJ/rand/all/long_2.csv', 'a')
+    output3 = open('../source_datasets/GCJ/rand/all/long_3.csv', 'a')
+    output4 = open('../source_datasets/GCJ/rand/all/short.csv', 'a')
     sum_ratio = 0
-    sum_pr = 0
-    num_path_dict = {}
-    code_path = '../source_datasets/BCB/id2sourcecode'
 
+    with open("../source_datasets/GCJ/rand/all/test_all.csv") as f1:
+        for line in f1:
+            aflag = 0  # Current code pair l_num > 510 Code number
+            flag1 = 0  # Current code pair l_num > 700 Code number
+            flag2 = 0  # Current code pair 700 >= l_num > 600 Code number
+            flag3 = 0  # Current code pair 600 >= l_num > 510 Code number
+            idx_list = line.strip().split(',')
+            for idx in idx_list[:-1]:
+                code_num = 0  # 当前代码满足要求的路径数
+                code = open(f"../source_datasets/GCJ/googlejam4/{idx}", encoding='UTF-8').read()
+                code = code.strip()
+                clean_code, code_dict = remove_comments_and_docstrings(code, 'java')
+                pre_code = ' '.join(clean_code.split())
+                code_tokens = tokenizer.tokenize(pre_code)
+                if len(code_tokens) > 510:
+                    aflag += 1
 
-    file_list = os.listdir(code_path)
-    random.shuffle(file_list)
-    logger.info("start!!!")
+                if len(code_tokens) > 700:
+                    flag1 += 1
+                elif len(code_tokens) > 600:
+                    flag2 += 1
+                elif len(code_tokens) > 510:
+                    flag3 += 1
+                # 2399 1820 3933
 
-    for file in file_list:
-        code = open(f"{code_path}/{file}", encoding='UTF-8').read()
-        code = code.strip()
-        num_id += 1
-        if num_id % 1000 == 0:
-            break
-        clean_code, code_dict = remove_comments_and_docstrings(code, 'java')
-        g = C_CFG()
-        code_ast = ps.tree_sitter_ast(clean_code, Lang.JAVA)
-        s_ast = g.parse_ast_file(code_ast.root_node)
-        # ctree.ipython_show_ast(s_ast)
-        num_path, cfg_allpath, _, ratio , path_real = g.get_allpath()
-        # sum_ratio += ratio
-        # sum_pr += path_real
+            # long_1: There is a value greater than 700
+            if flag1 >= 1:
+                output1.write(line)
+            # long_2: None is greater than 700, there is one greater than 600
+            if flag1 == 0 and flag2 >= 1:
+                output2.write(line)
+            # long_3: None is greater than 600, there is one greater than 510
+            if flag1 == 0 and flag2 == 0 and flag3 >= 1:
+                output3.write(line)
+            # short: No more than 510
+            if aflag == 0:
+                output4.write(line)
 
-    print("test file finish...", flush=True)
-    # print(sum_ratio/num_id, flush=True)
-    # print(sum_pr/num_id, flush=True)
+            # long: Both are greater than 510
+            # if aflag == 2:
+            #     output.write(line)
 
-    # 使用时恢复下两行
-    pickle.dump(path_dict, output)
-    output.close()
-    logger.info("finished!!!")
-
-
-    # with open('test\messaget3.txt', 'w') as f:
-    #     f.write(str(path_dict))
-    #     f.write('\n')
-
-    # embeds, cfg_allpath = path_dict['525']
-    # embeds = torch.tensor(embeds,  dtype=torch.float32, device=args.device)
+            #
+            #     g = C_CFG()
+            #     code_ast = ps.tree_sitter_ast(clean_code, Lang.JAVA)
+            #     s_ast = g.parse_ast_file(code_ast.root_node)
+            #     num_path, cfg_allpath, _, ratio = g.get_allpath()
+            #     sum_ratio += ratio
+            #     path_tokens1 = extract_pathtoken(code_dict, cfg_allpath)
+            #
+            #     for seq in path_tokens1[:5]:
+            #         seq = ' '.join(seq.split())
+            #         seq_tokens = tokenizer.tokenize(seq)
+            #         if len(seq_tokens) <= 510:
+            #             code_num += 1
+            #     if code_num >= 2:
+            #         line_num += 1
+            # if line_num == 2:
+            #     output.write(line)
+    output1.close()
+    output2.close()
+    output3.close()
+    output4.close()
 
 
 if __name__ == "__main__":
