@@ -144,14 +144,12 @@ python RQ4_long_dataset.py
 - long\_2: None of the test code pairs has more than 700 tokens, and there is a code snippet in the pair with more than 600 tokens. (5.5% of eval dataset). 
 - long\_1: The number of tokens in one code snippet is greater than 700. (7.7% of eval dataset). 
 
-<div style="display: flex; justify-content: space-between;">   
-    <img src="ecall.pdf" alt="Recall of different methods" style="width: 30%;"/> 
-    <img src="precision.pdf" alt="Precision of different methods" style="width: 30%;"/>   
-    <img src="RQ_1.pdf" alt="F1 score of different methods" style="width: 30%;"/>   
-</div>
+![RQ4](assets/RQ4.png)
 
 We then test the models obtained from training *Defu*, *CodeBERT*, and *GraphCodeBERT* on each test set separately. In the figure above, we plot the changes in the recall, precision, and F1 score of each method as the code snippet length increases in the test sets.
 From the figure, two phenomena become apparent. Firstly, a notable decline in the F1 metrics of every tool is evident with the increasing length of code excerpts within the test corpus. Secondly, *Defu*'s effectiveness in identifying extended code clones shows a significantly lesser decline compared to the other two tools. For instance, the F1 score of *CodeBERT* decreases from 0.8675 to 0.5599, marking a 35.46% decline, with the escalation of code snippet length. *GraphCodeBERT*'s F1 score exhibits a decrease from 0.9060 to 0.6637, indicating a 26.74% drop under similar conditions. In contrast, *Defu*'s F1 score exhibits a modest decrease from 0.9964 to 0.9487, a 4.79%. Even in the most extended long\_1 test scenario, *Defu* maintains an F1 score of 0.9413.
+
+
 
 ## Parameter details of our comparative tools
 
@@ -159,7 +157,7 @@ From the figure, two phenomena become apparent. Firstly, a notable decline in th
 | ------------- | ------------------------------------------------------------ |
 | SourcererCC   | Min lines: 6, Similarity threshold: 0.7                      |
 | Deckard       | Min tokens: 100, Stride: 2, Similarity threshold: 0.9        |
-| RtvNN         | RtNN phase: hidden layer size: 400, epoch: 25, λ1 for L2 regularization: 0.005, Initial learning rate: 0.003, Clipping gradient range: (-5.0, 5.0), RvNN phase: hidden layer size: (400, 400)-400, epoch: 5, Initial learning rate: 0.005, λ1 for L2 regularization: 0.005, Distance threshold: 2.56 |
+| RtvNN         | RtNN phase: hidden layer size: 400, epoch: 25, λ1 for L2 regularization: 0.005, Initial learning rate: 0.003, Clipping gradient range: (-5.0, 5.0), RtvNN phase: hidden layer size: (400, 400)-400, epoch: 5, Initial learning rate: 0.005, λ1 for L2 regularization: 0.005, Distance threshold: 2.56 |
 | ASTNN         | symbols embedding size: 128, hidden dimension: 100, mini-batch: 64, epoch: 5, threshold: 0.5, learning rate of AdaMax: 0.002 |
 | SCDetector    | distance measure: Cosine distance, dimension of token vector: 100, threshold: 0.5, learning rate: 0.0001 |
 | DeepSim       | Layers size: 88-6, (128x6-256-64)-128-32, epoch: 4, Initial learning rate: 0.001, λ for L2 regularization: 0.00003, Dropout: 0.75 |
