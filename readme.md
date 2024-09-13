@@ -1,6 +1,6 @@
 # Defu: Optimizing Semantic Code Clone Detection through Execution Path Decomposition and Embedding Fusion
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13753177.svg)](https://doi.org/10.5281/zenodo.13753177)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13759181.svg)](https://doi.org/10.5281/zenodo.13759181)
 
 
 ## Task Definition
